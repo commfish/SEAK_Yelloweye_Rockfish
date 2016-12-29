@@ -36,7 +36,7 @@
    10
 #
 ## - initial population
-   -1.05  -15.0     0.00      2      1    -3.64     1   # log_natural_mortality
+   -1.05  -15.0     0.00     -2      1    -3.64     1   # log_natural_mortality
     4.0     2.00    8.00      1      1     4.0      1   # log_mean_rec
     4.0     2.00    8.00      1      1     4.0      1   # log_mean_y1
     0.5     0.00    1.5       3      0      0       0   # sig1

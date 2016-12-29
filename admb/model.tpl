@@ -772,7 +772,7 @@ FUNCTION void writePosteriorSamples()
 FUNCTION void initializeModelParameters()
 	//fpen = 0;
 
-	log_natural_mortality = theta(1);
+	log_natural_mortality = -3.64966;  //theta(1);
 	log_mean_rec          = theta(2);
 	log_mean_y1           = theta(3);
 	sig1                  = theta(4);
@@ -1070,9 +1070,9 @@ FUNCTION Penalties
            mpen = 2;
          }
       
-       penalties(3)  = 0.5*log(2*M_PI) + log(mpen) +
-                       0.5*(square(log_natural_mortality - log(0.026)))
-                       / (2*square(mpen));
+       penalties(3)  = 0;//0.5*log(2*M_PI) + log(mpen) +
+                       //0.5*(square(log_natural_mortality - log(0.026)))
+                      // / (2*square(mpen));
 
 
 
