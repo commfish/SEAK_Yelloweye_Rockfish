@@ -1,0 +1,15 @@
+#  |-----------------------------------------------------------------|
+#  |                        INPUT FILES                              |
+#  |   There will be TWO files listed here, with these extensions:   |
+#  |                         .dat  .ctl                              |
+#  |   The files will be named after the stock they are modeling     |
+#  |               i.e.>>  sitka.dat   sitka.ctl                     |
+#  |-----------------------------------------------------------------|
+#  |  .dat  : Updated every year with catch & egg deposition data    |
+#  |  .ctl  : You *might* edit this file- who the fuck knows         |
+#  |-----------------------------------------------------------------|
+
+
+yelloweye.dat
+yelloweye.ctl
+

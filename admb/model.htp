@@ -1,0 +1,225 @@
+#if !defined(_MODEL_)
+#  define _MODEL_
+
+class model_data : public ad_comm{
+  ofstream *   pad_evalout;
+  init_adstring DataFile;
+  init_adstring ControlFile;
+  data_int DEBUG_FLAG;
+  data_int nboot;
+  data_int n_theta;
+  data_matrix theta_DM;
+  dvector theta_ival;
+  dvector theta_lb;
+  dvector theta_ub;
+  ivector theta_phz;
+  ivector theta_iprior;
+  dvector theta_p1;
+  dvector theta_p2;
+  data_int nMiscCont;
+  data_vector dMiscCont;
+  double sigr;
+  double sigma_sport;
+  double sigma_catch;
+  int ph_rec;
+  int ph_init;
+  int ph_Fdev;
+  int ph_FdevS;
+  int ph_spr;
+  data_number eof_ctl;
+  data_int nages;
+  data_int styr;
+  data_int endyr;
+  data_int recage;
+  data_number spawn_fract;
+  data_number srv_fract;
+  data_number fshy_fract;
+  int styr_rec;
+  int styr_sp;
+  int endyr_sp;
+  int nyrs;
+  ivector yy;
+  ivector aa;
+  ivector myy;
+  int nrecs_est;
+  dvector wt_mature;
+  data_vector p_mature;
+  data_vector wt;
+  data_vector morphology;
+  data_vector obs_catch;
+  data_int nyrs_sport;
+  data_ivector yrs_sport;
+  data_vector obs_sportcatch;
+  data_int nyrs_srv;
+  data_ivector yrs_srv;
+  data_vector obs_srv_biom;
+  data_vector obs_srv_se;
+  data_number area_skm;
+  dvector l_var;
+  data_int nyrs_fish_age;
+  data_ivector yrs_fish_age;
+  data_vector nsamples_fish_age;
+  data_matrix oac_fish;
+  dvector nmulti_fish_age;
+  data_int nyrs_cpue;
+  data_ivector yrs_cpue;
+  data_vector obs_cpue;
+  data_vector var_cpue;
+  dvector l_var_cpue;
+  data_int nyrs_cpue_iphc;
+  data_ivector yrs_cpue_iphc;
+  data_vector obs_cpue_iphc;
+  data_vector var_cpue_iphc;
+  dvector l_var_iphc;
+  data_matrix ageage;
+  data_int eof_dat;
+  int iyr;
+  int i;
+  int j;
+  int k;
+  double oo;
+  double offset;
+  ~model_data();
+  model_data(int argc,char * argv[]);
+  friend class model_parameters;
+};
+
+class model_parameters : public model_data ,
+  public function_minimizer
+{
+public:
+  ~model_parameters();
+  void preliminary_calculations(void);
+  void set_runtime(void);
+  virtual void * mycast(void) {return (void*)this;}
+  static int mc_phase(void)
+  {
+    return initial_params::mc_phase;
+  }
+  static int mceval_phase(void)
+  {
+    return initial_params::mceval_phase;
+  }
+  static int sd_phase(void)
+  {
+    return initial_params::sd_phase;
+  }
+  static int current_phase(void)
+  {
+    return initial_params::current_phase;
+  }
+  static int last_phase(void)
+  {
+    return (initial_params::current_phase
+      >=initial_params::max_number_phases);
+  }
+  static prevariable current_feval(void)
+  {
+    return *objective_function_value::pobjfun;
+  }
+private:
+  ivector integer_control_flags;
+  dvector double_control_flags;
+  param_init_bounded_number_vector theta;
+  param_number log_natural_mortality;
+  param_number log_mean_rec;
+  param_number log_mean_y1;
+  param_number sig1;
+  param_number log_avg_F;
+  param_number log_avg_Fs;
+  param_number fish_sel_slope;
+  param_number fish_sel_a50;
+  param_number log_q1;
+  param_number log_q2;
+  param_init_bounded_vector log_rec_dev;
+  param_init_bounded_vector init_pop;
+  param_stddev_vector recruitment;
+  param_vector fish_sel;
+  param_number q1;
+  param_number q2;
+  param_init_bounded_dev_vector log_F_devs;
+  param_init_bounded_dev_vector log_F_devs_sport;
+  param_vector Fmort;
+  param_vector Fmort2;
+  param_matrix F;
+  param_matrix F2;
+  param_number M;
+  param_matrix Z;
+  param_matrix S;
+  param_matrix natage;
+  param_matrix batage;
+  param_stddev_vector spawn_biom;
+  param_stddev_vector tot_biomass;
+  param_stddev_vector tot_N;
+  param_matrix catage;
+  param_matrix sportcatage;
+  param_vector pred_catch;
+  param_vector pred_sportcatch;
+  param_stddev_vector pred_srv;
+  param_stddev_vector pred_dens;
+  param_stddev_vector pred_cpue;
+  param_stddev_vector pred_cpue_iphc;
+  param_matrix age_comp;
+  param_vector expl_rate;
+  param_matrix res_age;
+  param_vector effn_fish_age;
+  param_vector sdnr_fish_age;
+  param_init_bounded_vector mF;
+  param_vector SBx;
+  param_vector Bx;
+  param_matrix Nspr;
+  param_matrix N0;
+  param_matrix N_ABC;
+  param_matrix N_OFL;
+  param_vector FABC;
+  param_vector FOFL;
+  param_vector ZABC;
+  param_vector ZOFL;
+  param_number stdev_rec;
+  param_stddev_number B40;
+  param_stddev_number ABC;
+  param_stddev_number OFL;
+  param_number F65;
+  param_number F60;
+  param_matrix catage_ABC;
+  param_matrix catage_OFL;
+  param_vector catch_ABC;
+  param_vector catch_OFL;
+  param_stddev_vector spawn_biom_ABC;
+  param_stddev_vector spawn_biom_OFL;
+  param_stddev_vector tot_biom_ABC;
+  param_number c_catch_like;
+  param_number s_catch_like;
+  param_vector surv_like;
+  param_number age_like;
+  param_vector penalties;
+  param_number sprpen;
+  param_number Like;
+  param_number prior_function_value;
+  param_number likelihood_function_value;
+  objective_function_value obj_fun;
+public:
+  virtual void userfunction(void);
+  virtual void report(const dvector& gradients);
+  virtual void final_calcs(void);
+  model_parameters(int sz,int argc, char * argv[]);
+  virtual void initializationfunction(void);
+ void writePosteriorSamples();
+ void initializeModelParameters();
+  void Selectivity(void);
+  void Mortality(void);
+  void Abundance(void);
+  void Catch(void);
+  void Predicted(void);
+  void Population_Summaries(void);
+  void Penalties(void);
+  void Catch_Like(void);
+  void Surv_Like(void);
+  void Age_Like(void);
+  void Objective_Function(void);
+  void spr_rates(void);
+  void Population_Projection(void);
+ double sdnr(const dvar_vector& pred,const dvector& obs,double m);
+
+};
+#endif
