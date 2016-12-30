@@ -799,8 +799,7 @@ FUNCTION Selectivity
          fish_sel(j)  = 1/(1+mfexp(-mfexp(fish_sel_slope)  *
                           (j-mfexp(fish_sel_a50))));
        }
-               
-     fish_sel   =  fish_sel  / max(fish_sel);   //Scale to 1
+              
                
 
 FUNCTION Mortality
