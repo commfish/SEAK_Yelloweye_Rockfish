@@ -732,13 +732,7 @@ PROCEDURE_SECTION
        {
          writePosteriorSamples();
 
-         evalout<<theta<<" "
-         <<log_rec_dev<<" "
-         <<init_pop<<" "
-         <<log_F_devs<<" "
-         <<log_F_devs_sport<<" "
-         <<penalties<<" "
-         <<obj_fun<<" "<<endl;
+         evalout<<theta<<" "<<endl;
        }
 
 
@@ -772,7 +766,7 @@ FUNCTION void writePosteriorSamples()
 FUNCTION void initializeModelParameters()
 	//fpen = 0;
 
-	log_natural_mortality = -3.64966;  //theta(1);
+	log_natural_mortality = theta(1);
 	log_mean_rec          = theta(2);
 	log_mean_y1           = theta(3);
 	sig1                  = theta(4);
@@ -799,7 +793,8 @@ FUNCTION Selectivity
          fish_sel(j)  = 1/(1+mfexp(-mfexp(fish_sel_slope)  *
                           (j-mfexp(fish_sel_a50))));
        }
-              
+               
+     fish_sel   =  fish_sel  / max(fish_sel);   //Scale to 1
                
 
 FUNCTION Mortality
@@ -1069,9 +1064,9 @@ FUNCTION Penalties
            mpen = 2;
          }
       
-       penalties(3)  = 0;//0.5*log(2*M_PI) + log(mpen) +
-                       //0.5*(square(log_natural_mortality - log(0.026)))
-                      // / (2*square(mpen));
+       penalties(3)  = 0.5*log(2*M_PI) + log(mpen) +
+                       0.5*(square(log_natural_mortality - log(0.026)))
+                       / (2*square(mpen));
 
 
 
