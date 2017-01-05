@@ -28,7 +28,11 @@ knitr::opts_chunk$set(echo = TRUE)
       The ADMB stock assessment model for Southeast Alaska Waters with fixed natural mortality  
       * Static structure to make it easier to follow
       * parametric bootstrap 
-      * mcmc output  
+      * mcmc output 
+4.  **model_output**  
+      Output files from the est_M and fixed_M structures for comparison. Also includes output from MCMC runs for selected derived quantities and parametric bootstraps of the main free parameters.  
+5.  **assessment_graphics.R**  
+      A set of graphic code to examine model outputs. Include read-in of the MCMC derived quantities, but only displays uncertainty as a function of the .std file values. Requires  'globals.R' file (included here)
 
 #SUMMARY
 The ADMB stock assessment model in this directory was recommended for formal adoption at the November 2016 Plan Team meeting in Seattle. Accordingly, the current work is to prepare the model and output for formal review by the Plan Team and Science and Statistical Committee.
