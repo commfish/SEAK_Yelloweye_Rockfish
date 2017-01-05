@@ -732,13 +732,7 @@ PROCEDURE_SECTION
        {
          writePosteriorSamples();
 
-         evalout<<theta<<" "
-         <<log_rec_dev<<" "
-         <<init_pop<<" "
-         <<log_F_devs<<" "
-         <<log_F_devs_sport<<" "
-         <<penalties<<" "
-         <<obj_fun<<" "<<endl;
+         evalout<<theta<<" "<<endl;
        }
 
 
@@ -799,7 +793,8 @@ FUNCTION Selectivity
          fish_sel(j)  = 1/(1+mfexp(-mfexp(fish_sel_slope)  *
                           (j-mfexp(fish_sel_a50))));
        }
-              
+               
+     //fish_sel   =  fish_sel  / max(fish_sel);   //Scale to 1
                
 
 FUNCTION Mortality
