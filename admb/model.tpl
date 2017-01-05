@@ -34,6 +34,35 @@ DATA_SECTION
      !!time(&start);
 
 
+  // |--------------------------------------------------------------------------|
+  // | COMMAND LINE ARGUMENT FOR -RETRO (from Steve Martell)
+  // |--------------------------------------------------------------------------|
+
+     int retro_yrs;
+     !!retro_yrs = 0;
+
+     int retro_mod;
+     !!retro_mod = 1;
+     
+ LOCAL_CALCS
+
+     int on = 0;
+
+     if (ad_comm::argc > 1)
+       {
+         retro_yrs = 0;
+           if ( (on=option_match(ad_comm::argc,ad_comm::argv,"-retro")) > -1 )
+             {
+               retro_yrs = atoi(ad_comm::argv[on+1]);
+               cout<<"|------------------------------------------|\n";
+               cout<<"|   Implementing retrospective analysis    |\n";
+               cout<<"|------------------------------------------|\n";
+               cout<<"|   Number of retro years = "<<retro_yrs<<endl;
+             }
+       }
+
+ END_CALCS
+
 
   // |--------------------------------------------------------------------------|
   // | STRINGS FOR INPUT FILES                                                  
@@ -63,11 +92,14 @@ DATA_SECTION
   // | DEBUG_FLAG  : Boolean Flag used for manual debugging
   // | nboot       : number of bootstrap draws to run. Refer to
   // |                PARAMETRIC_BOOTSTRAP section in FINAL_CALCS
+  // | M_switch    : switch for estimating or fixing natural mortality
 
      !! ad_comm::change_datafile_name(ControlFile);
 
      init_int DEBUG_FLAG;
      init_int nboot;
+     init_int M_switch;
+     
 
  // |-------------------------------------------------------------------------|
  // | DESIGN MATRIX FOR PARAMETER CONTROLS                                    |
@@ -358,6 +390,13 @@ DATA_SECTION
      number  offset;
 
 
+  // |-------------------------------------------------------------------------|
+  // | RETROSPECTIVE MOD OF 'endyr'
+  // |-------------------------------------------------------------------------|
+
+     !! endyr = endyr - retro_yrs;
+
+
 
  LOCAL_CALCS
 
@@ -406,7 +445,7 @@ DATA_SECTION
        offset = 0.0;
 
 
-       for (i=1; i<=nyrs_fish_age; i++)
+       for (i=1; i<=nyrs_fish_age-retro_yrs; i++)
         {
           offset -= nmulti_fish_age(i) *((oac_fish(i) + oo)
                        *log(oac_fish(i) + oo)); 
@@ -732,13 +771,7 @@ PROCEDURE_SECTION
        {
          writePosteriorSamples();
 
-         evalout<<theta<<" "
-         <<log_rec_dev<<" "
-         <<init_pop<<" "
-         <<log_F_devs<<" "
-         <<log_F_devs_sport<<" "
-         <<penalties<<" "
-         <<obj_fun<<" "<<endl;
+         evalout<<theta<<" "<<endl;
        }
 
 
@@ -770,9 +803,23 @@ FUNCTION void writePosteriorSamples()
        
 
 FUNCTION void initializeModelParameters()
-	//fpen = 0;
 
-	log_natural_mortality = -3.64966;  //theta(1);
+   switch(M_switch)
+    {
+      case 1: //estimate natural mortality
+        {
+          log_natural_mortality = theta(1);
+        }
+      break;
+
+      case 2: //fix natural mortality
+        {
+          log_natural_mortality = -3.64966;
+        }
+      break;
+
+    }  // close switch
+    
 	log_mean_rec          = theta(2);
 	log_mean_y1           = theta(3);
 	sig1                  = theta(4);
@@ -799,7 +846,6 @@ FUNCTION Selectivity
          fish_sel(j)  = 1/(1+mfexp(-mfexp(fish_sel_slope)  *
                           (j-mfexp(fish_sel_a50))));
        }
-              
                
 
 FUNCTION Mortality
@@ -939,7 +985,7 @@ FUNCTION Catch
   // | SPORT CATCH
   // |-------------|
     
-     for (i=1; i<=nyrs_sport; i++)
+     for (i=1; i<=nyrs_sport-retro_yrs; i++)
        {
          sportcatage(i) = elem_div(elem_prod(elem_prod(natage(yrs_sport(i)),
                            F2(yrs_sport(i))),(1.-S(yrs_sport(i)))),Z(yrs_sport(i)));
@@ -962,7 +1008,7 @@ FUNCTION Predicted
   q1 = mfexp(log_q1);
   q2 = mfexp(log_q2);
 
-     for (i=1;i<=nyrs_srv;i++)
+     for (i=1;i<=nyrs_srv-retro_mod;i++)
        {
          pred_srv(i) =  natage(yrs_srv(i)) * morphology;
          pred_srv(i) /= area_skm;
@@ -982,7 +1028,7 @@ FUNCTION Predicted
   // | FISHERY AGE COMPS, N, EFFN, SDNR
   // |-----------------------------------------------------------------------|
 
-     for (i=1;i<=nyrs_fish_age;i++) 
+     for (i=1;i<=nyrs_fish_age-retro_yrs;i++) 
        {
          age_comp(i)      = catage(yrs_fish_age(i))/
                             sum(catage(yrs_fish_age(i)))*ageage;
@@ -999,7 +1045,7 @@ FUNCTION Predicted
   // | COMMERCIAL FISHERY CPUE
   // |----------------------------------------------------------------------|
 
-     for (i=1;i<=nyrs_cpue;i++)
+     for (i=1;i<=nyrs_cpue-retro_yrs;i++)
        {
          pred_cpue(i) = q1* sum(elem_prod(natage(yrs_cpue(i)),wt)) / 1000; 
        }
@@ -1009,7 +1055,7 @@ FUNCTION Predicted
   // | IPHC SURVEY CPUE
   // |----------------------------------------------------------------------|  
   
-     for (i=1;i<=nyrs_cpue_iphc;i++)
+     for (i=1;i<=nyrs_cpue_iphc-retro_yrs;i++)
        {
          pred_cpue_iphc(i)  = q2* sum(natage(yrs_cpue_iphc(i))) / 1000;
        }
@@ -1036,9 +1082,7 @@ FUNCTION Population_Summaries
 
       }
 
-             
-            // spawn_biom_ABC(i) = sum((N_ABC(i) * mfexp(-spawn_fract * M)) *
-                                             //wt_mature);
+
 FUNCTION Penalties
   penalties.initialize();
 
@@ -1068,10 +1112,26 @@ FUNCTION Penalties
          {
            mpen = 2;
          }
+
+   switch(M_switch)
+    {
+      case 1: //estimate natural mortality
+        {
+           penalties(3)  = 0.5*log(2*M_PI) + log(mpen) +
+                           0.5*(square(log_natural_mortality - log(0.026)))
+                           / (2*square(mpen));
+        }
+      break;
+
+      case 2: //fix natural mortality
+        {
+                 penalties(3)  = 0;//
+        }
+      break;
+
+    }  // close switch
       
-       penalties(3)  = 0;//0.5*log(2*M_PI) + log(mpen) +
-                       //0.5*(square(log_natural_mortality - log(0.026)))
-                      // / (2*square(mpen));
+
 
 
 
@@ -1098,14 +1158,30 @@ FUNCTION Catch_Like
   // | CATCH LIKELIHOODS
   // |----------------------------------------------------------------------|
 
-     c_catch_like  +=  0.5*log(2*M_PI) + log(sigma_catch) +
-                       0.5*(norm2(log(obs_catch+oo) -
-                       log(pred_catch+oo))) / (2.*square(sigma_catch));
+     for (i=styr; i<=endyr; i++)
+       {
+         c_catch_like  +=  0.5*log(2*M_PI) + log(sigma_catch) +
+                           0.5*(square(log(obs_catch(i)+oo) -
+                           log(pred_catch(i)+oo))) / (2.*square(sigma_catch));
+       }
 
 
-    s_catch_like  +=  0.5*log(2*M_PI)  +log(sigma_sport) +
-                      0.5*(norm2(log(obs_sportcatch+oo) -
-                      log(pred_sportcatch+oo))) / (2.*square(sigma_sport));
+
+     //c_catch_like  +=  0.5*log(2*M_PI) + log(sigma_catch) +
+                      // 0.5*(norm2(log(obs_catch+oo) -
+                      // log(pred_catch+oo))) / (2.*square(sigma_catch));
+
+     for (i=1; i<=nyrs_sport-retro_yrs; i++)
+       {
+         s_catch_like  +=  0.5*log(2*M_PI)  +log(sigma_sport) +
+                      0.5*(square(log(obs_sportcatch(i)+oo) -
+                      log(pred_sportcatch(i)+oo))) / (2.*square(sigma_sport));
+       }
+       
+
+     //s_catch_like  +=  0.5*log(2*M_PI)  +log(sigma_sport) +
+                      //0.5*(norm2(log(obs_sportcatch+oo) -
+                      //log(pred_sportcatch+oo))) / (2.*square(sigma_sport));
 
 
 
@@ -1116,20 +1192,32 @@ FUNCTION Surv_Like
   // | ROV numbers per square kilometer - log-normal
   // |----------------------------------------------------------------------|
 
-     for (i=1; i<=nyrs_srv; i++)
+     for (i=1; i<=nyrs_srv-retro_mod; i++)
        {
-         l_var(i) = log(1. + (square(obs_srv_se(i))/square(obs_srv_biom(i))));
+         l_var(i) = log(1. + (square(obs_srv_se(i)))/square(obs_srv_biom(i)));// +
 
 
          surv_like(1) += 0.5*log(2*M_PI) + log(sqrt(l_var(i))) +
-                         0.5*(square(log(obs_srv_biom(i)) - log(pred_srv(i))) /
-                         (2*(l_var(i))));
+                         0.5*(square(log(obs_srv_biom(i)) - log(pred_srv(i)))) /
+                         (2*(l_var(i)));
        }
+
+
+
+     //for (i=1; i<=nyrs_srv; i++)
+       //{
+         //l_var(i) = log(1. + (square(obs_srv_se(i))/square(obs_srv_biom(i))));
+
+
+         //surv_like(1) += 0.5*log(2*M_PI) + log(sqrt(l_var(i))) +
+         //                0.5*(square(log(obs_srv_biom(i)) - log(pred_srv(i))) /
+         //                (2*(l_var(i))));
+       //}
   // |----------------------------------------------------------------------|
   // | COMMERCIAL CPUE - normal
   // |----------------------------------------------------------------------|
 
-     for (i=1; i<=nyrs_cpue; i++)
+     for (i=1; i<=nyrs_cpue-retro_yrs; i++)
        {
      
          surv_like(2) += 0.5*log(2*M_PI) + log(var_cpue(i))+
@@ -1142,7 +1230,7 @@ FUNCTION Surv_Like
   // | IPHC SURVEY CPUE - log-normal
   // |----------------------------------------------------------------------|
 
-     for (i=1; i<=nyrs_cpue_iphc; i++)
+     for (i=1; i<=nyrs_cpue_iphc-retro_yrs; i++)
        {                         
 
          l_var_iphc(i) = log(1 + ((var_cpue_iphc(i)+oo)/square(obs_cpue_iphc(i)+oo)));
@@ -1160,7 +1248,7 @@ FUNCTION Age_Like
   // | MULTINOMIAL LIKELIHOODS FOR AGE COMPOSITIONS
   // |----------------------------------------------------------------------|
 
-     for (i=1; i <= nyrs_fish_age; i++)
+     for (i=1; i <= nyrs_fish_age-retro_yrs; i++)
        {
          age_like -= nmulti_fish_age(i)*
                      ((oac_fish(i) + oo) * log(age_comp(i) + oo)) ;
@@ -1207,7 +1295,7 @@ FUNCTION Objective_Function
   // | Just for some graphics
   // |--------------------------------------|
 
-   for (i=1; i <= nyrs_fish_age; i++)
+   for (i=1; i <= nyrs_fish_age-retro_yrs; i++)
      {
        res_age(i) = oac_fish(i) - age_comp(i);
      }
@@ -1503,7 +1591,7 @@ FINAL_SECTION
      "  |   .cor file. If it barfs, make it +1.                             |  ";
      "  |                                                                   |  ";
      "  | 'nboot', defining the number of bootstrap draws, is set in the    |  ";
-     "  |   .ctl file and referenced in line 70 above.                      |  ";
+     "  |   .ctl file and referenced in line 99 above.                      |  ";
      "  |                                                                   |  ";
      "  | If you make it through all the output messages and reach the      |  ";
      "  | 'M5 tie-in' message and then it simply sits there, it is because  |  ";
@@ -1552,9 +1640,7 @@ FINAL_SECTION
      double stdev;
      double tmp_cor[stuff];
      double tmp_shit[stuff];
-     //int count;
 
-     //int good_count;
 
      cout<<" "<<endl;
      cout<<"What's the story, mother?"<<endl;
@@ -1746,6 +1832,7 @@ FINAL_SECTION
 
      cout<<""<<endl;
      cout<<"M-5 tie in... M-5... working... calling Bootstrap"<<endl;
+     cout<<""<<endl;
 
 
   // |------------------------------------------------------------------------|
@@ -1965,7 +2052,6 @@ FINAL_SECTION
 
 
 
-
         cout<< "O frabjous day!"<<endl;
         cout<< "The sheep frolic!"<<endl;
         cout<<""<<endl;
@@ -1980,6 +2066,7 @@ FINAL_SECTION
         cout<<"                 %%%%%*%%%%              "<<endl;
         cout<<"            ,,,,,,||,,,,||,,,,,          "<<endl;
         cout<<""<<endl;
+        
 
 FUNCTION double sdnr(const dvar_vector& pred,const dvector& obs,double m)
   RETURN_ARRAYS_INCREMENT();
