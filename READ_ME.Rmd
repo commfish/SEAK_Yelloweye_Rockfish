@@ -102,7 +102,7 @@ I have set up a secondary counter 'retro-mod' in the retro code that is called b
   + -retro 9   5  -> 9 year retrospective  
   + -retro 10  5  -> 10 year retrospective  
 
-Note that saving output from this will be done manually. It would not be difficult to write an R loop for this either. Note also that not all of these will converge to positive Hessian definites.
+Note that saving output from this will be done manually. It would not be difficult to write an R loop for this either. Note also that not all of these will converge to positive Hessian definites. NOTE: when entering the flag (i.e. -retro x y), make sure that only a single space separate the two arguments (x and y)
   
 
 
