@@ -72,7 +72,7 @@ For a complete description of model structure, data, and function, please review
 
 4. The .dat files produced by the R scripts, especially the RUNFILE and admb_dat_file_creation.R script, write the square root of the sample size for the age-composition matrix. Running the model, however, implements a MANUAL sample size correction: the variances of the residuals in the age-composition data are compared to the assumed input sample sizes by assessing the standard deviation of normalized residuals (Breen at el. 2003). Under the assumption that the normalized residuals are normally distributed, the acceptable limit for SDNR values, following Francis (2011) is given as  
 
-$$max(sdnr)<[\chi_{0.95}^2/(m-1)]^{0.5}$$
+$max(sdnr)<[\chi_{0.95}^2/(m-1)]^{0.5}$
 
 for which m = the number of years in the age-composition data set. If the SNDR for any given year exceeds this limit, the input age composition sample size vector is divided by the SDNR vector, and the model re-run with the revised sample sizes. The process is iteratively repeated until the target maximum SDNR value is reached. **This means that the model is initially run using the square root of the sample size as output by the R script, the resulting SDNR examined (in the model.rep file), and if any single element of the vector exceeds the limit, the sample sizes are divided by the SDNR values, AND THE RESULTING REVISED SAMPLE SIZE ARE MANUALLY INSERTED IN THE MODEL.DAT FILE, REPLACING THE SAMPLE SIZE VECTOR (COMMENT THAT LINE OUT).**   
 Note that the original sample size has been commented out and replaced by the SDNR modified sample size on lines 97 and 98 in admb\yelloweye.dat, which is the current model template.  
