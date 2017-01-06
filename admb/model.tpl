@@ -41,22 +41,24 @@ DATA_SECTION
   // | are annually updated, especially the ROV/submarine density survey data.
   // |--------------------------------------------------------------------------|
 
-     "  |-----------------------------------------------------------------  |  ";
-     "  |                         -RETRO flag values                        |  ";
-     "  |                                                                   |  ";
-     "  | For the current model ending in 2015::                            |  ";
-     "  |                                                                   |  ";
-     "  | Retrospective 1  (remove 1 year of data)   ->   -retro 1   1      |  ";
-     "  | Retrospective 2  (remove 2 year of data)   ->   -retro 2   1      |  ";
-     "  | Retrospective 3  (remove 3 year of data)   ->   -retro 3   2      |  ";
-     "  | Retrospective 4  (remove 4 year of data)   ->   -retro 4   3      |  ";
-     "  | Retrospective 5  (remove 5 year of data)   ->   -retro 5   3      |  ";
-     "  | Retrospective 6  (remove 6 year of data)   ->   -retro 6   3      |  ";
-     "  | Retrospective 7  (remove 7 year of data)   ->   -retro 7   4      |  ";
-     "  | Retrospective 8  (remove 8 year of data)   ->   -retro 8   4      |  ";
-     "  | Retrospective 9  (remove 9 year of data)   ->   -retro 9   5      |  ";
-     "  | Retrospective 10 (remove 10 years of data) ->   -retro 10  5      |  ";
-     "  |-----------------------------------------------------------------  |  ";
+     !!"  |-----------------------------------------------------------------  |  ";
+     !!"  |                         -RETRO flag values                        |  ";
+     !!"  |                                                                   |  ";
+     !!"  | For the current model ending in 2015::                            |  ";
+     !!"  |                                                                   |  ";
+     !!"  | Retrospective 1  (remove 1 year of data)   ->   -retro 1   1      |  ";
+     !!"  | Retrospective 2  (remove 2 year of data)   ->   -retro 2   1      |  ";
+     !!"  | Retrospective 3  (remove 3 year of data)   ->   -retro 3   2      |  ";
+     !!"  | Retrospective 4  (remove 4 year of data)   ->   -retro 4   3      |  ";
+     !!"  | Retrospective 5  (remove 5 year of data)   ->   -retro 5   3      |  ";
+     !!"  | Retrospective 6  (remove 6 year of data)   ->   -retro 6   3      |  ";
+     !!"  | Retrospective 7  (remove 7 year of data)   ->   -retro 7   4      |  ";
+     !!"  | Retrospective 8  (remove 8 year of data)   ->   -retro 8   4      |  ";
+     !!"  | Retrospective 9  (remove 9 year of data)   ->   -retro 9   5      |  ";
+     !!"  | Retrospective 10 (remove 10 years of data) ->   -retro 10  5      |  ";
+     !!"  |                                                                   |  ";
+     !!"  |  Make sure there is only a single space between the two numbers   |  ";
+     !!"  |-----------------------------------------------------------------  |  ";
      
      int retro_yrs;
      !!retro_yrs = 0;
@@ -76,7 +78,7 @@ DATA_SECTION
            if ( (on=option_match(ad_comm::argc,ad_comm::argv,"-retro")) > -1 )
              {
                retro_yrs = atoi(ad_comm::argv[on+1]);
-               retro_mod = atoi(ad_comm::argv[mn+2]);
+               retro_mod = atoi(ad_comm::argv[mn+3]);
                cout<<"|------------------------------------------|\n";
                cout<<"|   Implementing retrospective analysis    |\n";
                cout<<"|------------------------------------------|\n";
