@@ -80,23 +80,22 @@ Note that the original sample size has been commented out and replaced by the SD
 5. Retrospective analyses, in which a single year of data is removed for ten successive years one at a time, is a standard stock assessment inclusion. The retrospective model forms are in the master directory. The retro_yrs calls are at the very head of the .tpl file, under 'COMMAND LINE ARGUMENT FOR -RETRO'. The function removes one year of model data for each retro_yrs count (i.e. retro_yrs = 1 removes one year of data, retro_yrs = 10 removes ten years of data), but continues to estimate the full time series of parameters and derived quantities. The goal is to determine whether any specific data point(s) are exerting signficant forcing on model outputs and estimates. Under normal circumstances, implenetation of the retrospective analysis would entail simply running the model with the commend line flag '-retro X', where X is 1 to 10. In the yelloweye model, however, the submarine/ROV survey data that serve to scale absolute abundance are not annually updated. As those data are not present for some years, we need a separate counter for stripping them relative to the main 'retro_yrs' counter.
 I have set up a secondary counter 'retro-mod' in the retro code that is called by a second flag (-step) following the '-retro' flag in the command line. The proper arguments for each removed year are given in the tpl files as well as here:  
  
-     !!"  |-----------------------------------------------------------------  |  ";
-     !!"  |                       -RETRO -STEP  flag values                   |  ";
-     !!"  |                                                                   |  ";
-     !!"  | For the current model ending in 2015::                            |  ";
-     !!"  |                                                                   |  ";
-     !!"  | Retrospective 1  (remove 1 year of data)   ->   -retro 1 -step 1  |  ";
-     !!"  | Retrospective 2  (remove 2 year of data)   ->   -retro 2 -step 1  |  ";
-     !!"  | Retrospective 3  (remove 3 year of data)   ->   -retro 3 -step 2  |  ";
-     !!"  | Retrospective 4  (remove 4 year of data)   ->   -retro 4 -step 3  |  ";
-     !!"  | Retrospective 5  (remove 5 year of data)   ->   -retro 5 -step 3  |  ";
-     !!"  | Retrospective 6  (remove 6 year of data)   ->   -retro 6 -step 3  |  ";
-     !!"  | Retrospective 7  (remove 7 year of data)   ->   -retro 7 -step 4  |  ";
-     !!"  | Retrospective 8  (remove 8 year of data)   ->   -retro 8 -step 4  |  ";
-     !!"  | Retrospective 9  (remove 9 year of data)   ->   -retro 9 -step 5  |  ";
-     !!"  | Retrospective 10 (remove 10 years of data) ->   -retro 10 -step 5 |  ";
-     !!"  |                                                                   |  ";
-     !!"  |-----------------------------------------------------------------  |  ";  
+
+    -RETRO -STEP  flag values                   
+                                                                        
+      For the current model ending in 2015::                            
+                                                                        
+      Retrospective 1  (remove 1 year of data)   ->   -retro 1 -step 1  
+      Retrospective 2  (remove 2 year of data)   ->   -retro 2 -step 1  
+      Retrospective 3  (remove 3 year of data)   ->   -retro 3 -step 2  
+      Retrospective 4  (remove 4 year of data)   ->   -retro 4 -step 3  
+      Retrospective 5  (remove 5 year of data)   ->   -retro 5 -step 3  
+      Retrospective 6  (remove 6 year of data)   ->   -retro 6 -step 3  
+      Retrospective 7  (remove 7 year of data)   ->   -retro 7 -step 4  
+      Retrospective 8  (remove 8 year of data)   ->   -retro 8 -step 4  
+      Retrospective 9  (remove 9 year of data)   ->   -retro 9 -step 5  
+      Retrospective 10 (remove 10 years of data) ->   -retro 10 -step 5 
+
 
 Note that saving output from this will be done manually. It would not be difficult to write an R loop for this either. Note also that not all of these will converge to positive Hessian definites, and each year will be different, so the relevant graphics code will have to account for this each year. 
   
