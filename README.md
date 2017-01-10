@@ -77,20 +77,26 @@ $max(sdnr)<[\chi_{0.95}^2/(m-1)]^{0.5}$
 for which m = the number of years in the age-composition data set. If the SNDR for any given year exceeds this limit, the input age composition sample size vector is divided by the SDNR vector, and the model re-run with the revised sample sizes. The process is iteratively repeated until the target maximum SDNR value is reached. **This means that the model is initially run using the square root of the sample size as output by the R script, the resulting SDNR examined (in the model.rep file), and if any single element of the vector exceeds the limit, the sample sizes are divided by the SDNR values, AND THE RESULTING REVISED SAMPLE SIZE ARE MANUALLY INSERTED IN THE MODEL.DAT FILE, REPLACING THE SAMPLE SIZE VECTOR (COMMENT THAT LINE OUT).**   
 Note that the original sample size has been commented out and replaced by the SDNR modified sample size on lines 97 and 98 in admb\yelloweye.dat, which is the current model template.  
 
-5. Retrospective analyses, in which a single year of data is removed for ten successive years one at a time, is a standard stock assessment inclusion. The retrospective model forms are in the master directory. The retro_yrs calls are at the very head of the .tpl file, under 'COMMAND LINE ARGUMENT FOR -RETRO'. The function removes one year of model data for each retro_yrs count (i.e. retro_yrs = 1 removes one year of data, retro_yrs = 10 removes ten years of data), but continues to estimate the full time series of parameters and derived quantities. The goal is to determine whether any specific data point(s) are exerting signficant forcing on model outputs and estimates. Under normal circumstances, implenetation of the retrospective analysis would entail simply running the model with the commend line flag '-retro X', where X is 1 to 10. In the yelloweye model, however, we have data sets that are NOT annually sequential, most especially the submarine/ROV survey data that serve to scale absolute abundance. As those data are not present for some years, we need a separate counter for stripping them relative to the main 'retro_yrs' counter.
-I have set up a secondary counter 'retro-mod' in the retro code that is called by a second argument to the '-retro' flag in the command line. The proper arguments for each removed year are given in the tpl files as well as here:  
+5. Retrospective analyses, in which a single year of data is removed for ten successive years one at a time, is a standard stock assessment inclusion. The retrospective model forms are in the master directory. The retro_yrs calls are at the very head of the .tpl file, under 'COMMAND LINE ARGUMENT FOR -RETRO'. The function removes one year of model data for each retro_yrs count (i.e. retro_yrs = 1 removes one year of data, retro_yrs = 10 removes ten years of data), but continues to estimate the full time series of parameters and derived quantities. The goal is to determine whether any specific data point(s) are exerting signficant forcing on model outputs and estimates. Under normal circumstances, implenetation of the retrospective analysis would entail simply running the model with the commend line flag '-retro X', where X is 1 to 10. In the yelloweye model, however, the submarine/ROV survey data that serve to scale absolute abundance are not annually updated. As those data are not present for some years, we need a separate counter for stripping them relative to the main 'retro_yrs' counter.
+I have set up a secondary counter 'retro-mod' in the retro code that is called by a second flag (-step) following the '-retro' flag in the command line. The proper arguments for each removed year are given in the tpl files as well as here:  
  
+     !!"  |-----------------------------------------------------------------  |  ";
+     !!"  |                       -RETRO -STEP  flag values                   |  ";
+     !!"  |                                                                   |  ";
+     !!"  | For the current model ending in 2015::                            |  ";
+     !!"  |                                                                   |  ";
+     !!"  | Retrospective 1  (remove 1 year of data)   ->   -retro 1 -step 1  |  ";
+     !!"  | Retrospective 2  (remove 2 year of data)   ->   -retro 2 -step 1  |  ";
+     !!"  | Retrospective 3  (remove 3 year of data)   ->   -retro 3 -step 2  |  ";
+     !!"  | Retrospective 4  (remove 4 year of data)   ->   -retro 4 -step 3  |  ";
+     !!"  | Retrospective 5  (remove 5 year of data)   ->   -retro 5 -step 3  |  ";
+     !!"  | Retrospective 6  (remove 6 year of data)   ->   -retro 6 -step 3  |  ";
+     !!"  | Retrospective 7  (remove 7 year of data)   ->   -retro 7 -step 4  |  ";
+     !!"  | Retrospective 8  (remove 8 year of data)   ->   -retro 8 -step 4  |  ";
+     !!"  | Retrospective 9  (remove 9 year of data)   ->   -retro 9 -step 5  |  ";
+     !!"  | Retrospective 10 (remove 10 years of data) ->   -retro 10 -step 5 |  ";
+     !!"  |                                                                   |  ";
+     !!"  |-----------------------------------------------------------------  |  ";  
 
-  + -retro 1   1  -> 1 year retrospective  
-  + -retro 2   1  -> 2 year retrospective  
-  + -retro 3   2  -> 3 year retrospective  
-  + -retro 4   3  -> 4 year retrospective  
-  + -retro 5   3  -> 5 year retrospective  
-  + -retro 6   3  -> 6 year retrospective  
-  + -retro 7   4  -> 7 year retrospective  
-  + -retro 8   4  -> 8 year retrospective  
-  + -retro 9   5  -> 9 year retrospective  
-  + -retro 10  5  -> 10 year retrospective  
-
-Note that saving output from this will be done manually. It would not be difficult to write an R loop for this either. Note also that not all of these will converge to positive Hessian definites. NOTE: when entering the flag (i.e. -retro x y), make sure that only a single space separate the two arguments (x and y)
+Note that saving output from this will be done manually. It would not be difficult to write an R loop for this either. Note also that not all of these will converge to positive Hessian definites, and each year will be different, so the relevant graphics code will have to account for this each year. 
   
